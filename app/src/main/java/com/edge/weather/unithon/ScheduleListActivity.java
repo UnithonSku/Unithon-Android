@@ -108,7 +108,6 @@ public class ScheduleListActivity extends AppCompatActivity {
                             }
                             view.findViewById(R.id.row_period).setTag("true");
                         }
-
                         schedule_adapter.notifyDataSetChanged();
                     }
                 });

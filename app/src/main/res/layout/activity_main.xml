@@ -4,19 +4,63 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.edge.weather.unithon.MainActivity">
+    tools:context="com.edge.weather.unithon.MainActivity"
+    android:orientation="vertical">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dip">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="Lv.0" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_margin="20dp"
+            android:layout_weight="1" />
+
+    </LinearLayout>
+    <ImageView
+        android:id="@+id/userimagethink"
+        android:layout_width="150dip"
+        android:layout_height="50dip"
+        android:layout_gravity="right"
+        />
+    <RelativeLayout
+        android:layout_width="match_parent"
+
+        android:layout_height="200dip">
+        <ImageView
+            android:id="@+id/userimage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="bottom|end"
+            android:src="@android:drawable/ic_menu_view" />
+    </RelativeLayout>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ListView
+            android:id="@+id/list_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        </ListView>
+    </ScrollView>
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Wrtie Activity"
-        android:id="@+id/test_write"
-         />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Schedule_List_Activity"
-        android:id="@+id/test_schedule_list"/>
-
+        android:id="@+id/Newtodo"
+        android:text="할일 추가하기"
+        android:layout_width="match_parent"
+        android:layout_height="50dp" />
 </LinearLayout>

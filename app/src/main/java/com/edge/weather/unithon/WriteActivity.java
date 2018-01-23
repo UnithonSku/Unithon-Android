@@ -29,13 +29,11 @@ public class WriteActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent returnIntent = new Intent();
-
                 scheduleVO.setContent(schedule_content.getText().toString());
                 scheduleVO.setTitle(schedule_title.getText().toString());
                 returnIntent.putExtra("schedule", (Parcelable) scheduleVO);
                 setResult(Activity.RESULT_OK,returnIntent);
                 finish();
-
             }
         });
 
