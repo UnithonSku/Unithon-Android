@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     ListView listView;
     FloatingActionButton floatingActionButton;
     ProgressBar progressBar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,7 +37,10 @@ public class MainActivity extends AppCompatActivity {
         newtodo = (Button)findViewById(R.id.Newtodo) ;
         listView = (ListView)findViewById(R.id.list_view);
         progressBar = (ProgressBar)findViewById(R.id.progressBar);
+<<<<<<< HEAD
         floatingActionButton=(FloatingActionButton)findViewById(R.id.fab);
+=======
+>>>>>>> 4acf241cfa60fde4a1e30ac288a5c35938728361
         //말풍선 쓰레드 시작
         UserThinking userThinking = new UserThinking();
         userThinking.start();
@@ -69,11 +73,17 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent=new Intent(MainActivity.this,WriteActivity.class);
                 startActivityForResult(intent,1);
             }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 4acf241cfa60fde4a1e30ac288a5c35938728361
         });
+
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
+<<<<<<< HEAD
         if (requestCode == 1) {
             if(resultCode == Activity.RESULT_OK){
                 ScheduleVO scheduleVO=(ScheduleVO) data.getParcelableExtra("schedule");
@@ -86,6 +96,11 @@ public class MainActivity extends AppCompatActivity {
     }//onActivityResult
     //말풍선을 랜덤으로 보여주고 사라지게 하는 클래스스
     class UserThinking extends Thread {
+=======
+
+    //말풍선을 랜덤으로 보여주고 사라지게 하는 클래스스
+   class UserThinking extends Thread {
+>>>>>>> 4acf241cfa60fde4a1e30ac288a5c35938728361
         int num=3;
 
         @Override
@@ -94,10 +109,17 @@ public class MainActivity extends AppCompatActivity {
 
             for(;;){
                 try{
+<<<<<<< HEAD
                     Thread.sleep(1000);
                     Random rnd = new Random();
                     num = rnd.nextInt(100);
                     Log.d("숫자는 ",String.valueOf(num));
+=======
+                Thread.sleep(1000);
+                Random rnd = new Random();
+                num = rnd.nextInt(100);
+                Log.d("숫자는 ",String.valueOf(num));
+>>>>>>> 4acf241cfa60fde4a1e30ac288a5c35938728361
 
 
                     Thread.sleep(1000);
@@ -117,4 +139,8 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 4acf241cfa60fde4a1e30ac288a5c35938728361
