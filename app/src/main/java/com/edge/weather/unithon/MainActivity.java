@@ -2,6 +2,7 @@ package com.edge.weather.unithon;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -12,12 +13,14 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
     ImageView userimage,userimagethink;
     Button newtodo;
     ListView listView;
     ProgressBar progressBar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,8 +32,9 @@ public class MainActivity extends AppCompatActivity {
         newtodo = (Button)findViewById(R.id.Newtodo) ;
         listView = (ListView)findViewById(R.id.list_view);
         progressBar = (ProgressBar)findViewById(R.id.progressBar);
-
-
+        //말풍선 쓰레드 시작
+        UserThinking userThinking = new UserThinking();
+        userThinking.start();
 
 
         //GIF 파일 넣는 코드
@@ -61,8 +65,42 @@ public class MainActivity extends AppCompatActivity {
 
             }
 
-
         });
+
     }
 
+
+    //말풍선을 랜덤으로 보여주고 사라지게 하는 클래스스
+   class UserThinking extends Thread {
+        int num=3;
+
+        @Override
+        public void run() {
+            super.run();
+
+            for(;;){
+                try{
+                Thread.sleep(1000);
+                Random rnd = new Random();
+                num = rnd.nextInt(100);
+                Log.d("숫자는 ",String.valueOf(num));
+
+
+                    Thread.sleep(1000);
+                }
+                catch(Exception e){}
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(num%3==0){
+                            userimagethink.setVisibility(View.INVISIBLE);
+                        }
+                        else{
+                            userimagethink.setVisibility(View.VISIBLE);
+                        }
+                    }
+                });
+            }
+        }
+    }
 }
