@@ -2,6 +2,8 @@ package com.edge.weather.unithon;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.media.MediaPlayer;
+import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -18,25 +20,32 @@ import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 import java.util.ArrayList;
 import java.util.Random;
 
+import static com.edge.weather.unithon.R.raw.song_1;
+
 public class MainActivity extends AppCompatActivity {
     toDOViewAdapter toDOViewAdapter;
     ImageView userimage,userimagethink;
     Button newtodo;
     ListView listView;
-    FloatingActionButton floatingActionButton;
+    FloatingActionButton schedule_list_btn;
     ProgressBar progressBar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         userimage = (ImageView)findViewById(R.id.userimage);
+        String idByANDROID_ID = Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+
+
+
+        Log.d("고유값",idByANDROID_ID);
 
         //캐릭터 말풍선 이미지뷰
         userimagethink = (ImageView)findViewById(R.id.userimagethink);
         newtodo = (Button)findViewById(R.id.Newtodo) ;
         listView = (ListView)findViewById(R.id.list_view);
         progressBar = (ProgressBar)findViewById(R.id.progressBar);
-        floatingActionButton=(FloatingActionButton)findViewById(R.id.fab);
+        schedule_list_btn=(FloatingActionButton)findViewById(R.id.fab);
         //말풍선 쓰레드 시작
         UserThinking userThinking = new UserThinking();
         userThinking.start();
@@ -53,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
         toDOViewAdapter = new toDOViewAdapter();
         listView.setAdapter(toDOViewAdapter);
 
-        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+        schedule_list_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent=new Intent(MainActivity.this,ScheduleListActivity.class);
@@ -111,6 +120,9 @@ public class MainActivity extends AppCompatActivity {
                         }
                         else{
                             userimagethink.setVisibility(View.VISIBLE);
+                            //말풍선과 함께 음성도 나오도록!!ㅋㅋㅋㅋㅋㅋ
+                            MediaPlayer mPlayer2= MediaPlayer.create(getApplicationContext(),R.raw.song_1);
+                            mPlayer2.start();
                         }
                     }
                 });

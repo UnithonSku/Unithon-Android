@@ -11,6 +11,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -34,6 +39,17 @@ public class ScheduleListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_schedule_list);
+
+        Gson gson=new Gson();
+
+        JsonObject data1=new JsonObject();
+        data1.addProperty("deadline","2017/05/11");
+        data1.addProperty("title","줄넘기 50개");
+        data1.addProperty("content","매일 아침 9시에 줄넘기 50개하기");
+
+        Log.d("데이터 포맷팅",data1.toString());
+
+
 
 
 
