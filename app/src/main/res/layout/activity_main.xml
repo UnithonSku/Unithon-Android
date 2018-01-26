@@ -24,43 +24,74 @@
             android:layout_weight="1" />
 
     </LinearLayout>
-    <ImageView
-        android:id="@+id/userimagethink"
-        android:layout_width="150dip"
-        android:layout_height="50dip"
-        android:layout_gravity="right"
-        />
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
+        android:layout_height="300dip"
+        android:orientation="vertical">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dip">
 
-        android:layout_height="200dip">
+            <ImageView
+                android:id="@+id/userimagethink"
+                android:layout_width="150dip"
+                android:layout_height="50dip"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_gravity="right" />
+        </RelativeLayout>
+
         <ImageView
             android:id="@+id/userimage"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="250dip" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dip"
+        android:orientation="horizontal">
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:layout_gravity="bottom|end"
-            android:src="@android:drawable/ic_menu_view" />
-    </RelativeLayout>
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <ListView
-            android:id="@+id/list_view"
+            android:src="@android:drawable/ic_menu_view"
+            android:textAlignment="center" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab2"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-        </ListView>
-    </ScrollView>
-    <Button
-        android:id="@+id/Newtodo"
-        android:text="할일 추가하기"
-        android:layout_width="match_parent"
-        android:layout_height="50dp" />
+            android:layout_height="50dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:src="@android:drawable/ic_menu_view"
+            android:layout_marginLeft="30dp"
+            android:textAlignment="center" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab3"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:src="@android:drawable/ic_menu_view"
+            android:layout_marginLeft="150dp"
+            android:textAlignment="center" />
+
+    </LinearLayout>
+
+        <com.baoyz.swipemenulistview.SwipeMenuListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/list_view"
+            >
+        </com.baoyz.swipemenulistview.SwipeMenuListView>
+
+
 </LinearLayout>

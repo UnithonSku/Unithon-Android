@@ -1,21 +1,21 @@
 package com.edge.weather.unithon;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.ImageView;
 
 import java.util.ArrayList;
 
 /**
- * Created by student on 2018-01-23.
+ * Created by sj on 2018-01-26.
  */
 
-public class toDOViewAdapter extends BaseAdapter {
-    private ArrayList<toDoDTO> myitems= new ArrayList<>();
+public class CollectionViewAdapter extends BaseAdapter {
+    private ArrayList<CollectionDTO> myitems= new ArrayList<>();
 
     @Override
     public int getCount() {
@@ -37,29 +37,21 @@ public class toDOViewAdapter extends BaseAdapter {
         Context context = parent.getContext();
         if(convertView==null){
             LayoutInflater layoutInflater = (LayoutInflater)context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
-            convertView = layoutInflater.inflate(R.layout.todo_list_item,parent,false);
+            convertView = layoutInflater.inflate(R.layout.collection_item,parent,false);
         }
+        ImageView item_imageView = (ImageView) convertView.findViewById(R.id.item_imageView);
 
-        TextView title = (TextView) convertView.findViewById(R.id.todo_list_item);
 
-        toDoDTO items = (toDoDTO) getItem(position);
 
-        title.setText(items.getTitle());
+        CollectionDTO items = (CollectionDTO) getItem(position);
+        item_imageView.setImageDrawable(items.getIcon());
 
         return convertView;
     }
-    public void addItem(String title){
 
-
-        if(myitems.size()<5) {
-            toDoDTO item = new toDoDTO();
-            item.setTitle(title);
-            myitems.add(item);
-            this.notifyDataSetChanged();
-        }else{
-            //5개가 꽉찼는데 더 추가할려고 하는 경우
-        }
-
+    public void addItem(Drawable Icon){
+        CollectionDTO item = new CollectionDTO();
+        item.setIcon(Icon);
+        myitems.add(item);
     }
-
 }

@@ -22,6 +22,11 @@
         </activity>
         <activity android:name=".WriteActivity" />
         <activity android:name=".ScheduleListActivity"></activity>
+        <activity
+            android:name=".WritetodoList"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.Dialog.NoActionBar"></activity>
+        <activity android:name=".Collection"></activity>
     </application>
 
 </manifest>
