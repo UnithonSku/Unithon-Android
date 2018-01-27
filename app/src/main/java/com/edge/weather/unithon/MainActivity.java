@@ -2,6 +2,7 @@ package com.edge.weather.unithon;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -9,6 +10,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
@@ -22,6 +24,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -38,8 +41,18 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 import com.edge.weather.unithon.utils.AudioWriterPCM;
 import com.naver.speech.clientapi.SpeechRecognitionResult;
+import com.nhn.android.naverlogin.OAuthLogin;
+import com.nhn.android.naverlogin.OAuthLoginDefine;
+import com.nhn.android.naverlogin.OAuthLoginHandler;
+import com.nhn.android.naverlogin.ui.view.OAuthLoginButton;
 
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -54,17 +67,37 @@ public class MainActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private static final int MY_PERMISSION_AUDIO=1111;
     private static final String TAG = MainActivity.class.getSimpleName();
-    private static final String CLIENT_ID = "4c82B7NUDDtSt7HFzjZK";
+    private static final String CLIENT_ID = "7mMbd8FS1_lD3k99NYKu";
     private RecognitionHandler handler;
     private NaverRecognizer naverRecognizer;
     private AudioWriterPCM writer;
     private FloatingActionButton btnStart;
     private String mResult;
+    private OAuthLoginButton mOAuthLoginButton;
+    private static Context mContext;
+    private static String OAUTH_CLIENT_ID = "7mMbd8FS1_lD3k99NYKu";
+    private static String OAUTH_CLIENT_SECRET = "bFINTBJLUk";
+    private static String OAUTH_CLIENT_NAME = "네이버 아이디로 로그인";
+    static String access_token="";
+    String email="";
 
+    private static OAuthLogin mOAuthLoginInstance;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        OAuthLoginDefine.DEVELOPER_VERSION = true;
+        mContext = this;
+
+        initData();
+        updateView();
+
+        this.setTitle("OAuthLoginSample Ver." + OAuthLogin.getVersion());
+
+        mOAuthLoginInstance.startOauthLoginActivity(MainActivity.this, mOAuthLoginHandler);
+
+        new RequestApiTask().execute();
 
         //메인 캐릭터 이미지
         userimage = (ImageView)findViewById(R.id.userimage);
@@ -116,9 +149,6 @@ public class MainActivity extends AppCompatActivity {
         //collection 버튼
         collection_btn = (FloatingActionButton) findViewById(R.id.collection_btn);
 
-        //말풍선 쓰레드 시작
-        UserThinking userThinking = new UserThinking();
-        userThinking.start();
 
         //GIF 파일 넣는 코드
         GlideDrawableImageViewTarget Userimage = new GlideDrawableImageViewTarget(userimage);
@@ -126,6 +156,9 @@ public class MainActivity extends AppCompatActivity {
 
         userimagethink.setImageResource(R.drawable.thinking);
         progressBar.setProgress(50);
+        //말풍선 쓰레드 시작
+        UserThinking userThinking = new UserThinking();
+        userThinking.start();
 
         //메인 리스트뷰 어뎁터
         toDOViewAdapter = new toDOViewAdapter();
@@ -151,8 +184,12 @@ public class MainActivity extends AppCompatActivity {
         collection_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, Collection.class);
-                startActivityForResult(intent, 1);
+               /* Intent intent = new Intent(MainActivity.this, Collection.class);
+                startActivityForResult(intent, 1);*/
+                //달력 추가
+               CalendarCall calendarCall=new CalendarCall(access_token,"20171212","20171215","kimgunyoung",email,"aishdbfasdifb");
+                calendarCall.execute();
+
 
             }
         });
@@ -316,58 +353,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     //인텐트에서 값 받아오는 메소드
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        if (requestCode == 1) {
-            if(resultCode == Activity.RESULT_OK){
-                String Todo= data.getStringExtra("Todo");
-                String Date=data.getStringExtra("Date");
-                if(Todo.equals("")){
-                    Toast.makeText(getApplicationContext(),"할 일을 입력해주세요",Toast.LENGTH_SHORT).show();
-                }else{
-                    toDOViewAdapter.addItem(Todo);
-                }
-
-            }
-            if (resultCode == Activity.RESULT_CANCELED) {
-                //만약 반환값이 없을 경우의 코드를 여기에 작성하세요.
-            }
-        }
-    }//onActivityResult
-    //말풍선을 랜덤으로 보여주고 사라지게 하는 클래스스
-    class UserThinking extends Thread {
-        int num=3;
-
-        @Override
-        public void run() {
-            super.run();
-
-            for(;;){
-                try{
-                    Thread.sleep(1000);
-                    Random rnd = new Random();
-                    num = rnd.nextInt(100);
-                    Thread.sleep(1000);
-                }
-                catch(Exception e){}
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if(num%3==0){
-                            userimagethink.setVisibility(View.INVISIBLE);
-                        }
-                        else{
-                            userimagethink.setVisibility(View.VISIBLE);
-                            //말풍선과 함께 음성도 나오도록!!ㅋㅋㅋㅋㅋㅋ
-                            MediaPlayer mPlayer2= MediaPlayer.create(getApplicationContext(),R.raw.song_1);
-                            mPlayer2.start();
-                        }
-                    }
-                });
-            }
-        }
-    }
 
     @Override
     protected void onStart() {
@@ -378,6 +364,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         super.onResume();
 
         mResult = "";
@@ -406,6 +393,114 @@ public class MainActivity extends AppCompatActivity {
             MainActivity activity = mActivity.get();
             if (activity != null) {
                 activity.handleMessage(msg);
+            }
+        }
+    }
+    private void initData() {
+        mOAuthLoginInstance = OAuthLogin.getInstance();
+        mOAuthLoginInstance.init(mContext, OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET, OAUTH_CLIENT_NAME);
+		/*
+		 * 2015년 8월 이전에 등록하고 앱 정보 갱신을 안한 경우 기존에 설정해준 callback intent url 을 넣어줘야 로그인하는데 문제가 안생긴다.
+		 * 2015년 8월 이후에 등록했거나 그 뒤에 앱 정보 갱신을 하면서 package name 을 넣어준 경우 callback intent url 을 생략해도 된다.
+		 */
+        //mOAuthLoginInstance.init(mContext, OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET, OAUTH_CLIENT_NAME, OAUTH_callback_intent_url);
+    }
+
+    private void updateView() {
+        access_token=mOAuthLoginInstance.getAccessToken(mContext)+"";
+    }
+    static private OAuthLoginHandler mOAuthLoginHandler = new OAuthLoginHandler() {
+        @Override
+        public void run(boolean success) {
+            if (success) {
+                String accessToken = mOAuthLoginInstance.getAccessToken(mContext);
+                String refreshToken = mOAuthLoginInstance.getRefreshToken(mContext);
+                long expiresAt = mOAuthLoginInstance.getExpiresAt(mContext);
+                String tokenType = mOAuthLoginInstance.getTokenType(mContext);
+                access_token=accessToken;
+            } else {
+                String errorCode = mOAuthLoginInstance.getLastErrorCode(mContext).getCode();
+                String errorDesc = mOAuthLoginInstance.getLastErrorDesc(mContext);
+                Toast.makeText(mContext, "errorCode:" + errorCode + ", errorDesc:" + errorDesc, Toast.LENGTH_SHORT).show();
+            }
+        };
+    };
+
+    private class RequestApiTask extends AsyncTask<Void, Void, String> {
+        String result="";
+
+        @Override
+        protected void onPreExecute() {
+
+        }
+        @Override
+        protected String doInBackground(Void... params) {
+            String token = access_token;// 네이버 로그인 접근 토큰;
+            String header = "Bearer " + token; // Bearer 다음에 공백 추가
+            try {
+                String apiURL = "https://openapi.naver.com/v1/nid/me";
+                URL url = new URL(apiURL);
+                HttpURLConnection con = (HttpURLConnection)url.openConnection();
+                con.setRequestMethod("GET");
+                con.setRequestProperty("Authorization", header);
+                int responseCode = con.getResponseCode();
+                BufferedReader br;
+                if(responseCode==200) { // 정상 호출
+                    br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                } else {  // 에러 발생
+                    br = new BufferedReader(new InputStreamReader(con.getErrorStream()));
+                }
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+                while ((inputLine = br.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                br.close();
+                Log.d("인증",response.toString());
+                JSONObject jsonObject=new JSONObject(response.toString());
+                result=jsonObject.getJSONObject("response").get("email").toString();
+                System.out.println(result.toString());
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+            return result;
+        }
+        protected void onPostExecute(String content) {
+            email=content;
+        }
+    }
+    //말풍선을 랜덤으로 보여주고 사라지게 하는 클래스스
+    public class UserThinking extends Thread {
+        int num=3;
+
+        @Override
+        public void run() {
+            super.run();
+
+            for(;;){
+                try{
+                    Thread.sleep(1000);
+                    Random rnd = new Random();
+                    num = rnd.nextInt(100);
+                    Thread.sleep(1000);
+                }
+                catch(Exception e){
+                    e.printStackTrace();
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(num%3==0){
+                            userimagethink.setVisibility(View.INVISIBLE);
+                        }
+                        else{
+                            userimagethink.setVisibility(View.VISIBLE);
+                            //말풍선과 함께 음성도 나오도록!!ㅋㅋㅋㅋㅋㅋ
+                            MediaPlayer mPlayer2= MediaPlayer.create(getApplicationContext(),R.raw.song_1);
+                            mPlayer2.start();
+                        }
+                    }
+                });
             }
         }
     }
