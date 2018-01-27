@@ -14,7 +14,7 @@ import java.util.ArrayList;
  */
 
 public class toDOViewAdapter extends BaseAdapter {
-    private ArrayList<toDoDTO> myitems= new ArrayList<>();
+    private ArrayList<String> myitems= new ArrayList<>();
 
     @Override
     public int getCount() {
@@ -31,6 +31,10 @@ public class toDOViewAdapter extends BaseAdapter {
         return 0;
     }
 
+    public String getTitleItem(int position){
+        return myitems.get(position);
+    }
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         Context context = parent.getContext();
@@ -40,18 +44,29 @@ public class toDOViewAdapter extends BaseAdapter {
         }
 
         TextView title = (TextView) convertView.findViewById(R.id.todo_list_item);
-
-        toDoDTO items = (toDoDTO) getItem(position);
-
-        title.setText(items.getTitle());
+        title.setText(getItem(position).toString());
 
         return convertView;
     }
     public void addItem(String title){
-        toDoDTO item = new toDoDTO();
-        item.setTitle(title);
-        myitems.add(item);
+        if(myitems.size()<5) {
+            myitems.add(title);
+            this.notifyDataSetChanged();
+        }else{
+
+        }
+
+    }
+    public void delItem(int index){
+        myitems.remove(index);
         this.notifyDataSetChanged();
     }
+
+
+    public void replaceItem(int index,String title){
+        myitems.set(index,title);
+        this.notifyDataSetChanged();
+    }
+
 
 }
