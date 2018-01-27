@@ -43,10 +43,9 @@ public class MainActivity extends AppCompatActivity {
 
 
     private toDOViewAdapter toDOViewAdapter;
-    private ImageView userimage, userimagethink;
+    private ImageView userimagedefault, userimagethink, userimagehappy;
     private SwipeMenuListView listView;
     private FloatingActionButton schedule_list_btn, toDo_create_btn, collection_btn;
-    ;
     private ProgressBar progressBar;
     private static final int MY_PERMISSION_AUDIO = 1111;
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -55,8 +54,11 @@ public class MainActivity extends AppCompatActivity {
     private NaverRecognizer naverRecognizer;
     private AudioWriterPCM writer;
     private FloatingActionButton btnStart;
-    private String mResult,mood;
-
+    private String mResult, mood;
+    private GlideDrawableImageViewTarget Userimagedefault, Userimagehappy;
+    int tvalue = 0;
+    private static final int userthinking[]={R.drawable.userthinking1,R.drawable.userthinking2,R.drawable.userthinking3,R.drawable.userthinking4
+    ,R.drawable.userthinking5,R.drawable.userthinking6,R.drawable.userthinking7};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +66,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //메인 캐릭터 이미지
-        userimage = (ImageView) findViewById(R.id.userimage);
+        userimagedefault = (ImageView) findViewById(R.id.userimagedefault);
+        userimagehappy = (ImageView) findViewById(R.id.userimagehappy);
+        userimagehappy.setVisibility(View.GONE);
         //안드로이드 기기 고유 값
         String idByANDROID_ID = Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
         //음성 인식 버튼
@@ -108,13 +112,12 @@ public class MainActivity extends AppCompatActivity {
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
 
-
         //calandar view 버튼
-        schedule_list_btn=(FloatingActionButton) findViewById(R.id.schedule_list_btn);
+        schedule_list_btn = (FloatingActionButton) findViewById(R.id.schedule_list_btn);
         //To do 추가 버튼
-        toDo_create_btn=(FloatingActionButton) findViewById(R.id.toDo_create_btn);
+        toDo_create_btn = (FloatingActionButton) findViewById(R.id.toDo_create_btn);
         //collection 버튼
-        collection_btn=(FloatingActionButton) findViewById(R.id.collection_btn);
+        collection_btn = (FloatingActionButton) findViewById(R.id.collection_btn);
 
 
         //말풍선 쓰레드 시작
@@ -122,9 +125,10 @@ public class MainActivity extends AppCompatActivity {
         userThinking.start();
 
         //GIF 파일 넣는 코드
-        GlideDrawableImageViewTarget Userimage = new GlideDrawableImageViewTarget(userimage);
-        Glide.with(this).load(R.drawable.level1).into(Userimage);
-
+        Userimagedefault = new GlideDrawableImageViewTarget(userimagedefault);
+        Userimagehappy = new GlideDrawableImageViewTarget(userimagehappy);
+        Glide.with(this).load(R.drawable.lv1_basic).into(Userimagedefault);
+        Glide.with(this).load(R.drawable.lv2_basic).into(Userimagehappy);
         userimagethink.setImageResource(R.drawable.thinking);
         progressBar.setProgress(50);
 
@@ -203,16 +207,16 @@ public class MainActivity extends AppCompatActivity {
             public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
                 switch (index) {
                     case 0:
-                     //수정
+                        //수정
                         String title2 = toDOViewAdapter.getTitleItem(position);
 
-                     Intent intent = new Intent(MainActivity.this,Replacetodo.class);
-                    intent.putExtra("title", title2);
-                    intent.putExtra("position",position);
-                    Toast.makeText(getApplicationContext(),title2+"을 수정합니다."+position+"위치",Toast.LENGTH_LONG).show();
+                        Intent intent = new Intent(MainActivity.this, Replacetodo.class);
+                        intent.putExtra("title", title2);
+                        intent.putExtra("position", position);
+                        Toast.makeText(getApplicationContext(), title2 + "을 수정합니다." + position + "번째 목록", Toast.LENGTH_LONG).show();
                         startActivity(intent);
 
-                       // toDOViewAdapter.replaceItem(position,"new replace");
+                        // toDOViewAdapter.replaceItem(position,"new replace");
 
 
                         break;
@@ -266,9 +270,10 @@ public class MainActivity extends AppCompatActivity {
                 //txtResult.setText(mResult);
                 Toast.makeText(getApplicationContext(), mResult + "", Toast.LENGTH_LONG).show();
                 Voiceclassify voiceclassify = new Voiceclassify(mResult);
-               mood= voiceclassify.classify();
-               // Toast.makeText(getApplicationContext(), mood + "", Toast.LENGTH_SHORT).show();
-
+                mood = voiceclassify.classify();
+                Toast.makeText(getApplicationContext(), mood + "", Toast.LENGTH_SHORT).show();
+                Motion motion = new Motion(mood);
+                motion.start();
                 break;
 
             case R.id.recognitionError:
@@ -363,7 +368,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-
     }//onActivityResult
 
     //말풍선을 랜덤으로 보여주고 사라지게 하는 클래스
@@ -383,8 +387,6 @@ public class MainActivity extends AppCompatActivity {
                     Random rnd = new Random();
                     num = rnd.nextInt(100);
                     Log.d("숫자는 ", String.valueOf(num));
-
-
                     Thread.sleep(1000);
                 } catch (Exception e) {
                 }
@@ -394,6 +396,7 @@ public class MainActivity extends AppCompatActivity {
                         if (num % 3 == 0) {
                             userimagethink.setVisibility(View.INVISIBLE);
                         } else {
+
                             userimagethink.setVisibility(View.VISIBLE);
                             //말풍선과 함께 음성도 나오도록!!ㅋㅋㅋㅋㅋㅋ
                             MediaPlayer mPlayer2 = MediaPlayer.create(getApplicationContext(), R.raw.song_1);
@@ -404,6 +407,62 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+
+    //음성인식 행동 변화 클래스
+    class Motion extends Thread {
+        String nmood;
+        public Motion(String nmood){
+            this.nmood = nmood;
+        }
+
+        @Override
+        public void run() {
+            super.run();
+
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (nmood.equals("happy")) {
+                            Handler mhandler = new Handler();
+                            mhandler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    userimagehappy.setVisibility(View.GONE);
+                                    userimagedefault.setVisibility(View.VISIBLE);
+                                }
+                            },3000);
+                            userimagehappy.setVisibility(View.VISIBLE);
+                            userimagedefault.setVisibility(View.GONE);
+
+
+                        }
+                        else {
+                            Handler mhandler = new Handler();
+                            mhandler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    userimagehappy.setVisibility(View.GONE);
+                                    userimagedefault.setVisibility(View.VISIBLE);
+                                }
+                            },3000);
+                            userimagehappy.setVisibility(View.VISIBLE);
+                            userimagedefault.setVisibility(View.GONE);
+
+
+                        }
+                    }
+                });
+
+        }
+    }
+
+
+
+
+
+
 
 
     @Override
@@ -446,34 +505,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-    class Motion extends Thread {
-    String nmood;
-    public Motion(String nmood){
-        this.nmood = nmood;
-    }
 
-        @Override
-        public void run() {
-            super.run();
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (nmood.equals("happy")) {
-                         //   userimage.setImageURI();     // 기쁠때
-
-                        } else {
-                          // userimage.setImageURI();   // 못알아들었을때
-                        }
-                        try {
-                            Thread.sleep(3000);
-                            //userimage.setImageURI();      //기본 으로 돌아오기
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-
-        }
-    }
 }
 
