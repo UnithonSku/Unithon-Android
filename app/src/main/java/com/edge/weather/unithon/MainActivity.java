@@ -2,14 +2,22 @@ package com.edge.weather.unithon;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
+<<<<<<< HEAD
 import android.os.Bundle;
+=======
+import android.os.AsyncTask;
+>>>>>>> 43ded7c697fd3d01b4a04ccab8768afe878e15c4
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
@@ -22,6 +30,12 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+<<<<<<< HEAD
+=======
+import android.view.WindowManager;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+>>>>>>> 43ded7c697fd3d01b4a04ccab8768afe878e15c4
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -33,9 +47,25 @@ import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 import com.edge.weather.unithon.utils.AudioWriterPCM;
+import com.google.gson.Gson;
 import com.naver.speech.clientapi.SpeechRecognitionResult;
+import com.nhn.android.naverlogin.OAuthLogin;
+import com.nhn.android.naverlogin.OAuthLoginDefine;
+import com.nhn.android.naverlogin.OAuthLoginHandler;
+import com.nhn.android.naverlogin.ui.view.OAuthLoginButton;
 
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
+//<<<<<<< HEAD
+//=======
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Calendar;
+//>>>>>>> 43ded7c697fd3d01b4a04ccab8768afe878e15c4
 import java.util.List;
 import java.util.Random;
 
@@ -54,16 +84,43 @@ public class MainActivity extends AppCompatActivity {
     private NaverRecognizer naverRecognizer;
     private AudioWriterPCM writer;
     private FloatingActionButton btnStart;
+//<<<<<<< HEAD
     private String mResult, mood;
     private GlideDrawableImageViewTarget Userimagedefault, Userimagehappy;
     int tvalue = 0;
     private static final int userthinking[]={R.drawable.userthinking1,R.drawable.userthinking2,R.drawable.userthinking3,R.drawable.userthinking4
     ,R.drawable.userthinking5,R.drawable.userthinking6,R.drawable.userthinking7};
 
+//=======
+
+
+    private static Context mContext;
+    private static String OAUTH_CLIENT_ID = "7mMbd8FS1_lD3k99NYKu";
+    private static String OAUTH_CLIENT_SECRET = "bFINTBJLUk";
+    private static String OAUTH_CLIENT_NAME = "네이버 아이디로 로그인";
+    String access_token="";
+
+    String email="";
+    Intent alarmintent;
+    PendingIntent pendingIntent;
+    long triggerTime=0;
+
+  //  private static OAuthLogin mOAuthLoginInstance;
+//>>>>>>> 43ded7c697fd3d01b4a04ccab8768afe878e15c4
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+        OAuthLoginDefine.DEVELOPER_VERSION = true;
+        mContext = this;
+        initData();
+        updateView();
+        this.setTitle("OAuthLoginSample Ver." + OAuthLogin.getVersion());
+        mOAuthLoginInstance.startOauthLoginActivity(MainActivity.this, mOAuthLoginHandler);
+        new RequestApiTask().execute();
+
 
         //메인 캐릭터 이미지
         userimagedefault = (ImageView) findViewById(R.id.userimagedefault);
@@ -119,6 +176,7 @@ public class MainActivity extends AppCompatActivity {
         //collection 버튼
         collection_btn = (FloatingActionButton) findViewById(R.id.collection_btn);
 
+<<<<<<< HEAD
 
         //말풍선 쓰레드 시작
         UserThinking userThinking = new UserThinking();
@@ -129,13 +187,22 @@ public class MainActivity extends AppCompatActivity {
         Userimagehappy = new GlideDrawableImageViewTarget(userimagehappy);
         Glide.with(this).load(R.drawable.lv1_basic).into(Userimagedefault);
         Glide.with(this).load(R.drawable.lv2_basic).into(Userimagehappy);
+=======
+
+        //GIF 파일 넣는 코드
+        GlideDrawableImageViewTarget Userimage = new GlideDrawableImageViewTarget(userimage);
+        Glide.with(this).load(R.drawable.aa).into(Userimage);
+
+>>>>>>> 43ded7c697fd3d01b4a04ccab8768afe878e15c4
         userimagethink.setImageResource(R.drawable.thinking);
         progressBar.setProgress(50);
+        //말풍선 쓰레드 시작
+        UserThinking userThinking = new UserThinking();
+        userThinking.start();
 
         //메인 리스트뷰 어뎁터
         toDOViewAdapter = new toDOViewAdapter();
         listView.setAdapter(toDOViewAdapter);
-
 
         schedule_list_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -158,9 +225,17 @@ public class MainActivity extends AppCompatActivity {
         collection_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, Collection.class);
-                startActivityForResult(intent, 1);
-
+               /* Intent intent = new Intent(MainActivity.this, Collection.class);
+                startActivityForResult(intent, 1);*/
+                //달력 추가
+                CalendarCall calendarCall=new CalendarCall();
+               calendarCall.setAccess_token(access_token);
+               calendarCall.setStart_day("20171212");
+                calendarCall.setEnd_day("20171215");
+                calendarCall.setTitle("kimgunyoung");
+                calendarCall.setEmail(email);
+                calendarCall.setCal_id("ewrewrwererererere");
+                calendarCall.execute();
             }
         });
 
@@ -231,9 +306,15 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
+        //long intervalTime = 24 * 60 * 60 * 1000;// 24시간
+        /*AlarmNotificationReceiver.content="오늘 하루 습관을 키워봐요!!";
+        AlarmManager manager=(AlarmManager)getSystemService(Context.ALARM_SERVICE);
+        alarmintent=new Intent(getApplicationContext(),AlarmNotificationReceiver.class);
+        pendingIntent= PendingIntent.getBroadcast(getApplicationContext(),0,alarmintent,0);
+        triggerTime = setTriggerTime(18,25);
+        manager.setRepeating(AlarmManager.RTC_WAKEUP, triggerTime,intervalTime,pendingIntent);*/
 
     }
-
 
     // Handle clova api
     private void handleMessage(Message msg) {
@@ -347,6 +428,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //인텐트에서 값 받아오는 메소드
+<<<<<<< HEAD
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
@@ -407,6 +489,9 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+=======
+
+>>>>>>> 43ded7c697fd3d01b4a04ccab8768afe878e15c4
 
 
     //음성인식 행동 변화 클래스
@@ -474,6 +559,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         super.onResume();
 
         mResult = "";
@@ -505,6 +591,132 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+    private void initData() {
+        mOAuthLoginInstance = OAuthLogin.getInstance();
+        mOAuthLoginInstance.init(mContext, OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET, OAUTH_CLIENT_NAME);
+		/*
+		 * 2015년 8월 이전에 등록하고 앱 정보 갱신을 안한 경우 기존에 설정해준 callback intent url 을 넣어줘야 로그인하는데 문제가 안생긴다.
+		 * 2015년 8월 이후에 등록했거나 그 뒤에 앱 정보 갱신을 하면서 package name 을 넣어준 경우 callback intent url 을 생략해도 된다.
+		 */
+        //mOAuthLoginInstance.init(mContext, OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET, OAUTH_CLIENT_NAME, OAUTH_callback_intent_url);
+    }
+
+    private void updateView() {
+        access_token=mOAuthLoginInstance.getAccessToken(mContext)+"";
+
+
+    }
+    private OAuthLoginHandler mOAuthLoginHandler = new OAuthLoginHandler() {
+        @Override
+        public void run(boolean success) {
+            if (success) {
+                String accessToken = mOAuthLoginInstance.getAccessToken(mContext);
+                String refreshToken = mOAuthLoginInstance.getRefreshToken(mContext);
+                long expiresAt = mOAuthLoginInstance.getExpiresAt(mContext);
+                String tokenType = mOAuthLoginInstance.getTokenType(mContext);
+                access_token=accessToken;
+
+
+            } else {
+                String errorCode = mOAuthLoginInstance.getLastErrorCode(mContext).getCode();
+                String errorDesc = mOAuthLoginInstance.getLastErrorDesc(mContext);
+                Toast.makeText(mContext, "errorCode:" + errorCode + ", errorDesc:" + errorDesc, Toast.LENGTH_SHORT).show();
+            }
+        };
+    };
+
+    private class RequestApiTask extends AsyncTask<Void, Void, String> {
+        String result="";
+
+        @Override
+        protected void onPreExecute() {
+
+        }
+        @Override
+        protected String doInBackground(Void... params) {
+            String token = access_token;// 네이버 로그인 접근 토큰;
+            String header = "Bearer " + token; // Bearer 다음에 공백 추가
+            try {
+                String apiURL = "https://openapi.naver.com/v1/nid/me";
+                URL url = new URL(apiURL);
+                HttpURLConnection con = (HttpURLConnection)url.openConnection();
+                con.setRequestMethod("GET");
+                con.setRequestProperty("Authorization", header);
+                int responseCode = con.getResponseCode();
+                BufferedReader br;
+                if(responseCode==200) { // 정상 호출
+                    br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                } else {  // 에러 발생
+                    br = new BufferedReader(new InputStreamReader(con.getErrorStream()));
+                }
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+                while ((inputLine = br.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                br.close();
+                Log.d("인증",response.toString());
+                JSONObject jsonObject=new JSONObject(response.toString());
+                result=jsonObject.getJSONObject("response").get("email").toString();
+                System.out.println(result.toString());
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+            return result;
+        }
+        protected void onPostExecute(String content) {
+            email=content;
+
+        }
+    }
+    //말풍선을 랜덤으로 보여주고 사라지게 하는 클래스스
+    public class UserThinking extends Thread {
+        int num=3;
+
+        @Override
+        public void run() {
+            super.run();
+
+            for(;;){
+                try{
+                    Thread.sleep(1000);
+                    Random rnd = new Random();
+                    num = rnd.nextInt(100);
+                    Thread.sleep(1000);
+                }
+                catch(Exception e){
+                    e.printStackTrace();
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(num%3==0){
+                            userimagethink.setVisibility(View.INVISIBLE);
+                        }
+                        else{
+                            userimagethink.setVisibility(View.VISIBLE);
+                            //말풍선과 함께 음성도 나오도록!!ㅋㅋㅋㅋㅋㅋ
+                            MediaPlayer mPlayer2= MediaPlayer.create(getApplicationContext(),R.raw.song_1);
+                            mPlayer2.start();
+                        }
+                    }
+                });
+            }
+        }
+    }
+    private long setTriggerTime(int hour, int minute)
+    {
+        // timepicker
+        Calendar curTime = Calendar.getInstance();
+        curTime.set(Calendar.HOUR_OF_DAY,hour);
+        curTime.set(Calendar.MINUTE,minute);
+        curTime.set(Calendar.SECOND, 0);
+        long btime = curTime.getTimeInMillis();
+        long triggerTime = btime;
+        return triggerTime;
+    }
+
+
 
 }
 
