@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
     private static String OAUTH_CLIENT_SECRET = "bFINTBJLUk";
     private static String OAUTH_CLIENT_NAME = "네이버 아이디로 로그인";
     String access_token="";
-    CalendarCall calendarCall;
+
     String email="";
     Intent alarmintent;
     PendingIntent pendingIntent;
@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        calendarCall=new CalendarCall();
+
         OAuthLoginDefine.DEVELOPER_VERSION = true;
         mContext = this;
         initData();
@@ -193,12 +193,13 @@ public class MainActivity extends AppCompatActivity {
                /* Intent intent = new Intent(MainActivity.this, Collection.class);
                 startActivityForResult(intent, 1);*/
                 //달력 추가
+                CalendarCall calendarCall=new CalendarCall();
                calendarCall.setAccess_token(access_token);
                calendarCall.setStart_day("20171212");
                 calendarCall.setEnd_day("20171215");
                 calendarCall.setTitle("kimgunyoung");
                 calendarCall.setEmail(email);
-                calendarCall.setCal_id("hjbhibibiu");
+                calendarCall.setCal_id("ewrewrwererererere");
                 calendarCall.execute();
             }
         });
@@ -423,7 +424,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateView() {
         access_token=mOAuthLoginInstance.getAccessToken(mContext)+"";
-        //storeString(access_token);
+
 
     }
     private OAuthLoginHandler mOAuthLoginHandler = new OAuthLoginHandler() {
@@ -434,8 +435,8 @@ public class MainActivity extends AppCompatActivity {
                 String refreshToken = mOAuthLoginInstance.getRefreshToken(mContext);
                 long expiresAt = mOAuthLoginInstance.getExpiresAt(mContext);
                 String tokenType = mOAuthLoginInstance.getTokenType(mContext);
-                access_token=accessToken+"";
-                //storeString(access_token);
+                access_token=accessToken;
+
 
             } else {
                 String errorCode = mOAuthLoginInstance.getLastErrorCode(mContext).getCode();
@@ -536,6 +537,6 @@ public class MainActivity extends AppCompatActivity {
         return triggerTime;
     }
 
-   
+
 
 }
