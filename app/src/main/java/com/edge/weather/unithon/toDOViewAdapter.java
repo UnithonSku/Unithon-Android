@@ -15,7 +15,7 @@ import java.util.ArrayList;
  */
 
 public class toDOViewAdapter extends BaseAdapter {
-    private ArrayList<toDoDTO> myitems= new ArrayList<>();
+    private ArrayList<String> myitems= new ArrayList<>();
 
     @Override
     public int getCount() {
@@ -41,20 +41,13 @@ public class toDOViewAdapter extends BaseAdapter {
         }
 
         TextView title = (TextView) convertView.findViewById(R.id.todo_list_item);
-
-        toDoDTO items = (toDoDTO) getItem(position);
-
-        title.setText(items.getTitle());
+        title.setText(getItem(position).toString());
 
         return convertView;
     }
     public void addItem(String title){
-
-
         if(myitems.size()<5) {
-            toDoDTO item = new toDoDTO();
-            item.setTitle(title);
-            myitems.add(item);
+            myitems.add(title);
             this.notifyDataSetChanged();
         }else{
             //5개가 꽉찼는데 더 추가할려고 하는 경우

@@ -17,11 +17,11 @@ Button addtodobutton;
 DatePicker addtododate;
 String todo;
 int year,month,day;
-    private ScheduleVO scheduleVO;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        scheduleVO=new ScheduleVO();
+
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
@@ -37,16 +37,14 @@ int year,month,day;
             @Override
             public void onClick(View view) {
                 Intent returnIntent = new Intent();
-
-               todo= addtodotext.getText().toString();
-               year = addtododate.getYear();
-               month =addtododate.getMonth()+1;
-               day = addtododate.getDayOfMonth();
-                scheduleVO.setContent(year+"");
-                scheduleVO.setTitle(todo);
-                returnIntent.putExtra("schedule", (Parcelable) scheduleVO);
-                setResult(Activity.RESULT_OK,returnIntent);
-                finish();
+                   todo= addtodotext.getText().toString();
+                   year = addtododate.getYear();
+                   month =addtododate.getMonth()+1;
+                   day = addtododate.getDayOfMonth();
+                    returnIntent.putExtra("Todo",todo+"");
+                    returnIntent.putExtra("Date",year+"/"+month+"/"+day);
+                    setResult(Activity.RESULT_OK,returnIntent);
+                    finish();
               //데이터 다시 전달 하면 된다.
 
             }

@@ -53,7 +53,7 @@
         android:orientation="horizontal">
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab"
+            android:id="@+id/schedule_list_btn"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_alignParentBottom="true"
@@ -63,7 +63,7 @@
             android:textAlignment="center" />
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab2"
+            android:id="@+id/toDo_create_btn"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_alignParentBottom="true"
@@ -74,14 +74,24 @@
             android:textAlignment="center" />
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab3"
+            android:id="@+id/collection_btn"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:src="@android:drawable/ic_menu_view"
-            android:layout_marginLeft="150dp"
+            android:layout_marginLeft="60dp"
+            android:textAlignment="center" />
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/btn_start"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:src="@android:drawable/ic_menu_view"
+            android:layout_marginLeft="90dp"
             android:textAlignment="center" />
 
     </LinearLayout>
