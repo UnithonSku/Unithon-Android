@@ -15,20 +15,61 @@ import java.net.URLEncoder;
 
 public class CalendarCall extends AsyncTask<Void, Void, String> {
     String result="";
-    String access_token;
-    String start_day;
-    String end_day;
-    String title;
-    String email;
-    String cal_id;
-    public CalendarCall(String token,String start_day,String end_day,String title,String email,String cal_id){
-        this.access_token=token;
-        this.start_day=start_day;
-        this.end_day=end_day;
-        this.title=title;
-        this.email=email;
-        this.cal_id=cal_id;
+    private String access_token;
+    private String start_day;
+    private String end_day;
+    private String title;
+    private String email;
+    private String cal_id;
+
+    public String getAccess_token() {
+        return access_token;
     }
+
+    public void setAccess_token(String access_token) {
+        this.access_token = access_token;
+    }
+
+    public String getStart_day() {
+        return start_day;
+    }
+
+    public void setStart_day(String start_day) {
+        this.start_day = start_day;
+    }
+
+    public String getEnd_day() {
+        return end_day;
+    }
+
+    public void setEnd_day(String end_day) {
+        this.end_day = end_day;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getCal_id() {
+        return cal_id;
+    }
+
+    public void setCal_id(String cal_id) {
+        this.cal_id = cal_id;
+    }
+
     @Override
     protected void onPreExecute() {
         //mApiResultText.setText((String) "");

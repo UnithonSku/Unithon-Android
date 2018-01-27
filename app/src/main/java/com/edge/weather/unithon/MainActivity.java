@@ -2,9 +2,12 @@ package com.edge.weather.unithon;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -40,6 +43,7 @@ import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 import com.edge.weather.unithon.utils.AudioWriterPCM;
+import com.google.gson.Gson;
 import com.naver.speech.clientapi.SpeechRecognitionResult;
 import com.nhn.android.naverlogin.OAuthLogin;
 import com.nhn.android.naverlogin.OAuthLoginDefine;
@@ -54,6 +58,7 @@ import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
 
@@ -78,8 +83,12 @@ public class MainActivity extends AppCompatActivity {
     private static String OAUTH_CLIENT_ID = "7mMbd8FS1_lD3k99NYKu";
     private static String OAUTH_CLIENT_SECRET = "bFINTBJLUk";
     private static String OAUTH_CLIENT_NAME = "네이버 아이디로 로그인";
-    static String access_token="";
+    String access_token="";
+    CalendarCall calendarCall;
     String email="";
+    Intent alarmintent;
+    PendingIntent pendingIntent;
+    long triggerTime=0;
 
     private static OAuthLogin mOAuthLoginInstance;
     @Override
@@ -87,17 +96,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        calendarCall=new CalendarCall();
         OAuthLoginDefine.DEVELOPER_VERSION = true;
         mContext = this;
-
         initData();
         updateView();
-
         this.setTitle("OAuthLoginSample Ver." + OAuthLogin.getVersion());
-
         mOAuthLoginInstance.startOauthLoginActivity(MainActivity.this, mOAuthLoginHandler);
-
         new RequestApiTask().execute();
+
 
         //메인 캐릭터 이미지
         userimage = (ImageView)findViewById(R.id.userimage);
@@ -152,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
 
         //GIF 파일 넣는 코드
         GlideDrawableImageViewTarget Userimage = new GlideDrawableImageViewTarget(userimage);
-        Glide.with(this).load(R.drawable.yawoori).into(Userimage);
+        Glide.with(this).load(R.drawable.aa).into(Userimage);
 
         userimagethink.setImageResource(R.drawable.thinking);
         progressBar.setProgress(50);
@@ -163,7 +170,6 @@ public class MainActivity extends AppCompatActivity {
         //메인 리스트뷰 어뎁터
         toDOViewAdapter = new toDOViewAdapter();
         listView.setAdapter(toDOViewAdapter);
-
 
         schedule_list_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -187,10 +193,13 @@ public class MainActivity extends AppCompatActivity {
                /* Intent intent = new Intent(MainActivity.this, Collection.class);
                 startActivityForResult(intent, 1);*/
                 //달력 추가
-               CalendarCall calendarCall=new CalendarCall(access_token,"20171212","20171215","kimgunyoung",email,"aishdbfasdifb");
+               calendarCall.setAccess_token(access_token);
+               calendarCall.setStart_day("20171212");
+                calendarCall.setEnd_day("20171215");
+                calendarCall.setTitle("kimgunyoung");
+                calendarCall.setEmail(email);
+                calendarCall.setCal_id("hjbhibibiu");
                 calendarCall.execute();
-
-
             }
         });
 
@@ -245,9 +254,15 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
+        //long intervalTime = 24 * 60 * 60 * 1000;// 24시간
+        /*AlarmNotificationReceiver.content="오늘 하루 습관을 키워봐요!!";
+        AlarmManager manager=(AlarmManager)getSystemService(Context.ALARM_SERVICE);
+        alarmintent=new Intent(getApplicationContext(),AlarmNotificationReceiver.class);
+        pendingIntent= PendingIntent.getBroadcast(getApplicationContext(),0,alarmintent,0);
+        triggerTime = setTriggerTime(18,25);
+        manager.setRepeating(AlarmManager.RTC_WAKEUP, triggerTime,intervalTime,pendingIntent);*/
 
     }
-
 
     // Handle clova api
     private void handleMessage(Message msg) {
@@ -408,8 +423,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateView() {
         access_token=mOAuthLoginInstance.getAccessToken(mContext)+"";
+        //storeString(access_token);
+
     }
-    static private OAuthLoginHandler mOAuthLoginHandler = new OAuthLoginHandler() {
+    private OAuthLoginHandler mOAuthLoginHandler = new OAuthLoginHandler() {
         @Override
         public void run(boolean success) {
             if (success) {
@@ -417,7 +434,9 @@ public class MainActivity extends AppCompatActivity {
                 String refreshToken = mOAuthLoginInstance.getRefreshToken(mContext);
                 long expiresAt = mOAuthLoginInstance.getExpiresAt(mContext);
                 String tokenType = mOAuthLoginInstance.getTokenType(mContext);
-                access_token=accessToken;
+                access_token=accessToken+"";
+                //storeString(access_token);
+
             } else {
                 String errorCode = mOAuthLoginInstance.getLastErrorCode(mContext).getCode();
                 String errorDesc = mOAuthLoginInstance.getLastErrorDesc(mContext);
@@ -467,6 +486,7 @@ public class MainActivity extends AppCompatActivity {
         }
         protected void onPostExecute(String content) {
             email=content;
+
         }
     }
     //말풍선을 랜덤으로 보여주고 사라지게 하는 클래스스
@@ -504,5 +524,18 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+    private long setTriggerTime(int hour, int minute)
+    {
+        // timepicker
+        Calendar curTime = Calendar.getInstance();
+        curTime.set(Calendar.HOUR_OF_DAY,hour);
+        curTime.set(Calendar.MINUTE,minute);
+        curTime.set(Calendar.SECOND, 0);
+        long btime = curTime.getTimeInMillis();
+        long triggerTime = btime;
+        return triggerTime;
+    }
+
+   
 
 }
