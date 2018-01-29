@@ -125,10 +125,51 @@
     <ImageView
         android:id="@+id/userimageunhappy"
         android:layout_width="match_parent"
+<<<<<<< HEAD
         android:layout_height="match_parent"
         android:layout_toRightOf="@id/btn_start" />
     <ImageView
         android:id="@+id/level_1"
+=======
+        android:layout_height="300dip"
+        android:orientation="vertical">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="100dip">
+
+            <ImageView
+                android:id="@+id/userimagethink"
+                android:layout_width="150dip"
+                android:layout_height="100dip"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_gravity="right" />
+
+        </RelativeLayout>
+<FrameLayout
+    android:layout_width="match_parent"
+    android:layout_height="200dip">
+        <ImageView
+            android:id="@+id/userimagedefault"
+            android:layout_width="match_parent"
+            android:layout_height="200dip"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="11dp" />
+    <ImageView
+        android:id="@+id/userimagehappy"
+        android:layout_width="match_parent"
+        android:layout_height="200dip"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="11dp"/>
+</FrameLayout>
+    </LinearLayout>
+    <LinearLayout
+>>>>>>> c051777a6d11a48a3f0ec7dbe5a8e7c63047fc01
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_toRightOf="@id/btn_start" />

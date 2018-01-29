@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="300dip"
+    android:layout_height="550dip"
+    android:layout_gravity="center"
+    tools:context="com.edge.weather.unithon.Replacetodo"
+    android:orientation="vertical">
+    <EditText
+        android:id="@+id/addtodotext"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:hint="할일을 추가해주세요"
+        android:layout_marginTop="20dip"
+        />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:text="언제까지 하실건가요?"
+        android:layout_marginTop="20dip"/>
+    <DatePicker
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/addtododate"
+        android:layout_gravity="center_horizontal"
+        android:datePickerMode="spinner"
+        android:calendarViewShown="false"/>
+
+    <Button
+        android:id="@+id/addtodobutton"
+        android:layout_width="match_parent"
+        android:layout_height="50dip"
+        android:text="할일 추가하기"
+        android:layout_marginTop="130dip"/>
+
+</LinearLayout>

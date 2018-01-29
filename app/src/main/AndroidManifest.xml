@@ -30,8 +30,20 @@
         <activity
             android:name=".WritetodoList"
             android:screenOrientation="portrait"
+<<<<<<< HEAD
             android:theme="@android:style/Theme.Holo.Light.Dialog.NoActionBar" />
         <activity android:name=".Collection" />
+=======
+<<<<<<< HEAD
+            android:theme="@android:style/Theme.Holo.Light.Dialog.NoActionBar" />
+        <activity android:name=".Collection" />
+        <activity android:name=".Replacetodo"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.Dialog.NoActionBar"/>
+=======
+            android:theme="@android:style/Theme.Holo.Light.Dialog.NoActionBar"></activity>
+        <activity android:name=".Collection"></activity>
+>>>>>>> c051777a6d11a48a3f0ec7dbe5a8e7c63047fc01
 
         <!-- 네이버 아이디로 로그인에서 사용하는 Activity 를 등록 -->
         <activity
@@ -44,12 +56,16 @@
         <!-- [naveroauthlogin][end] -->
 
         <receiver android:name=".AlarmNotificationReceiver" />
+<<<<<<< HEAD
 
         <activity
             android:name=".ReservationActivity"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Holo.Light.Dialog.NoActionBar" />
         <activity android:name=".MainActivity"></activity>
+=======
+>>>>>>> 43ded7c697fd3d01b4a04ccab8768afe878e15c4
+>>>>>>> c051777a6d11a48a3f0ec7dbe5a8e7c63047fc01
     </application>
 
 </manifest>

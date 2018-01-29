@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.gson.JsonObject;
 
@@ -33,6 +32,10 @@ public class toDOViewAdapter extends BaseAdapter {
     @Override
     public long getItemId(int position) {
         return 0;
+    }
+
+    public String getTitleItem(int position){
+        return myitems.get(position);
     }
 
     @Override
@@ -101,9 +104,20 @@ public class toDOViewAdapter extends BaseAdapter {
             myitems.add(title);
             this.notifyDataSetChanged();
         }else{
-            //5개가 꽉찼는데 더 추가할려고 하는 경우
+
         }
 
     }
+    public void delItem(int index){
+        myitems.remove(index);
+        this.notifyDataSetChanged();
+    }
+
+
+    public void replaceItem(int index,String title){
+        myitems.set(index,title);
+        this.notifyDataSetChanged();
+    }
+
 
 }
