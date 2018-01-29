@@ -43,7 +43,10 @@ import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 import com.edge.weather.unithon.utils.AudioWriterPCM;
+import com.github.kevinsawicki.http.HttpRequest;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.naver.speech.clientapi.SpeechRecognitionResult;
 import com.nhn.android.naverlogin.OAuthLogin;
 import com.nhn.android.naverlogin.OAuthLoginDefine;
@@ -57,18 +60,20 @@ import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
 import static com.edge.weather.unithon.R.raw.song_1;
 
 public class MainActivity extends AppCompatActivity {
-    private toDOViewAdapter toDOViewAdapter;
-    private ImageView userimage,userimagethink;
+    static public toDOViewAdapter toDOViewAdapter;
+    private int thinkingindex,res;
     private SwipeMenuListView listView;
-    private FloatingActionButton schedule_list_btn, toDo_create_btn, collection_btn;;
+    private ImageView schedule_list_btn, toDo_create_btn, collection_btn;;
     private ProgressBar progressBar;
     private static final int MY_PERMISSION_AUDIO=1111;
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -76,26 +81,35 @@ public class MainActivity extends AppCompatActivity {
     private RecognitionHandler handler;
     private NaverRecognizer naverRecognizer;
     private AudioWriterPCM writer;
-    private FloatingActionButton btnStart;
-    private String mResult;
+    private ImageView btnStart;
+    private String mResult,mood;
     private OAuthLoginButton mOAuthLoginButton;
     private static Context mContext;
     private static String OAUTH_CLIENT_ID = "7mMbd8FS1_lD3k99NYKu";
     private static String OAUTH_CLIENT_SECRET = "bFINTBJLUk";
     private static String OAUTH_CLIENT_NAME = "네이버 아이디로 로그인";
     String access_token="";
-
+    private GlideDrawableImageViewTarget Userimagedefault, Userimagehappy,Userimageunhappy,level_1,level_3;
+    static public ImageView level_2_image,userimagehappy,userimageunhappy, userimagethink,level_1_image,level_3_image;
     String email="";
     Intent alarmintent;
     PendingIntent pendingIntent;
     long triggerTime=0;
+    String judge="";
+    String idByANDROID_ID;
+    private final int[] ranthink={R.drawable.userthinking1,R.drawable.userthinking2,R.drawable.userthinking3,R.drawable.userthinking4,R.drawable.userthinking5,R.drawable.userthinking6,R.drawable.userthinking7,R.drawable.userthinking8,R.drawable.userthinking9};
+    JsonObject jsonObject;
 
     private static OAuthLogin mOAuthLoginInstance;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        level_2_image = (ImageView) findViewById(R.id.userimagedefault);
+        userimagehappy = (ImageView) findViewById(R.id.userimagehappy);
+        userimageunhappy = (ImageView) findViewById(R.id.userimageunhappy);
+        level_1_image = (ImageView) findViewById(R.id.level_1);
+        level_3_image = (ImageView) findViewById(R.id.level_3);
 
         OAuthLoginDefine.DEVELOPER_VERSION = true;
         mContext = this;
@@ -106,12 +120,13 @@ public class MainActivity extends AppCompatActivity {
         new RequestApiTask().execute();
 
 
-        //메인 캐릭터 이미지
-        userimage = (ImageView)findViewById(R.id.userimage);
+
         //안드로이드 기기 고유 값
-        String idByANDROID_ID = Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+        idByANDROID_ID = Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+        /*UserInfo userInfo=new UserInfo(idByANDROID_ID);
+        userInfo.execute();*/
         //음성 인식 버튼
-        btnStart = (FloatingActionButton) findViewById(R.id.btn_start);
+        btnStart = (ImageView) findViewById(R.id.btn_start);
         //권한 허용 메소드
         checkPremission();
 
@@ -119,7 +134,20 @@ public class MainActivity extends AppCompatActivity {
         handler = new RecognitionHandler(this);
         naverRecognizer = new NaverRecognizer(this, handler, CLIENT_ID);
 
-
+        Userimagedefault = new GlideDrawableImageViewTarget(level_2_image);
+        Userimagehappy = new GlideDrawableImageViewTarget(userimagehappy);
+        Userimageunhappy = new GlideDrawableImageViewTarget(userimageunhappy);
+        level_1=new GlideDrawableImageViewTarget(level_1_image);
+        level_3=new GlideDrawableImageViewTarget(level_3_image);
+        Glide.with(this).load(R.drawable.default1).into(Userimagedefault);
+        Glide.with(this).load(R.drawable.happy).into(Userimagehappy);
+        Glide.with(this).load(R.drawable.unhappy).into(Userimageunhappy);
+        Glide.with(this).load(R.drawable.level_1_default).into(level_1);
+        Glide.with(this).load(R.drawable.level_3_default).into(level_3);
+        userimagehappy.setVisibility(View.GONE);
+        userimageunhappy.setVisibility(View.GONE);
+        level_2_image.setVisibility(View.GONE);
+        level_3_image.setVisibility(View.GONE);
         //clova api 실행
         btnStart.setOnClickListener(new View.OnClickListener() {
 
@@ -148,21 +176,18 @@ public class MainActivity extends AppCompatActivity {
         //To do 리스트뷰
         listView = (SwipeMenuListView) findViewById(R.id.list_view);
         //경험치 프로그레스바
-        progressBar = (ProgressBar)findViewById(R.id.progressBar);
+        progressBar = (ProgressBar)findViewById(R.id.main_front_progress);
         //calandar view 버튼
-        schedule_list_btn=(FloatingActionButton)findViewById(R.id.schedule_list_btn);
+        schedule_list_btn=(ImageView) findViewById(R.id.schedule_list_btn);
         //To do 추가 버튼
-        toDo_create_btn = (FloatingActionButton) findViewById(R.id.toDo_create_btn);
+        toDo_create_btn = (ImageView) findViewById(R.id.toDo_create_btn);
         //collection 버튼
-        collection_btn = (FloatingActionButton) findViewById(R.id.collection_btn);
+        collection_btn = (ImageView) findViewById(R.id.collection_btn);
 
-
-        //GIF 파일 넣는 코드
-        GlideDrawableImageViewTarget Userimage = new GlideDrawableImageViewTarget(userimage);
-        Glide.with(this).load(R.drawable.aa).into(Userimage);
 
         userimagethink.setImageResource(R.drawable.thinking);
         progressBar.setProgress(50);
+
         //말풍선 쓰레드 시작
         UserThinking userThinking = new UserThinking();
         userThinking.start();
@@ -170,6 +195,22 @@ public class MainActivity extends AppCompatActivity {
         //메인 리스트뷰 어뎁터
         toDOViewAdapter = new toDOViewAdapter();
         listView.setAdapter(toDOViewAdapter);
+
+        jsonObject=new JsonObject();
+        jsonObject.addProperty("title","줄넘기 50개");
+        jsonObject.addProperty("date","2018-01-25");
+        jsonObject.addProperty("done",false);
+
+        toDOViewAdapter.addItem(jsonObject);
+
+        jsonObject=new JsonObject();
+        jsonObject.addProperty("title","영단어 50개 외우기");
+        jsonObject.addProperty("date","2018-02-10");
+        jsonObject.addProperty("done",false);
+
+        toDOViewAdapter.addItem(jsonObject);
+
+
 
         schedule_list_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -184,23 +225,25 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, WritetodoList.class);
-                startActivityForResult(intent, 1);
+                intent.putExtra("token",access_token);
+                intent.putExtra("email",email);
+                startActivity(intent);
             }
         });
         collection_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               /* Intent intent = new Intent(MainActivity.this, Collection.class);
-                startActivityForResult(intent, 1);*/
+                Intent intent = new Intent(MainActivity.this, Collection.class);
+                startActivityForResult(intent, 1);
                 //달력 추가
-                CalendarCall calendarCall=new CalendarCall();
+                /*CalendarCall calendarCall=new CalendarCall();
                calendarCall.setAccess_token(access_token);
                calendarCall.setStart_day("20171212");
                 calendarCall.setEnd_day("20171215");
                 calendarCall.setTitle("kimgunyoung");
                 calendarCall.setEmail(email);
                 calendarCall.setCal_id("ewrewrwererererere");
-                calendarCall.execute();
+                calendarCall.execute();*/
             }
         });
 
@@ -245,10 +288,16 @@ public class MainActivity extends AppCompatActivity {
             public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
                 switch (index) {
                     case 0:
-                        // 첫번째 버튼 클릭 시
+                        //첫번째 버튼 클릭시
+                        toDOViewAdapter.myitems.remove((JsonObject)toDOViewAdapter.getItem(position));
+                        toDOViewAdapter.notifyDataSetChanged();
+
                         break;
                     case 1:
                         // 두번째 버튼 클릭 시
+
+                        toDOViewAdapter.myitems.remove((JsonObject)toDOViewAdapter.getItem(position));
+                        toDOViewAdapter.notifyDataSetChanged();
                         break;
                 }
                 // false : close the menu; true : not close the menu
@@ -299,6 +348,12 @@ public class MainActivity extends AppCompatActivity {
                 mResult = strBuf.toString();
                 //txtResult.setText(mResult);
                 Toast.makeText(getApplicationContext(),mResult+"",Toast.LENGTH_SHORT).show();
+                Voiceclassify voiceclassify = new Voiceclassify(mResult);
+                mood= voiceclassify.classify();
+                // Toast.makeText(getApplicationContext(), mood + "", Toast.LENGTH_SHORT).show();
+                //모션시작
+                Motion motion = new Motion(mood);
+                motion.start();
                 break;
 
             case R.id.recognitionError:
@@ -369,7 +424,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     //인텐트에서 값 받아오는 메소드
-
 
     @Override
     protected void onStart() {
@@ -490,41 +544,7 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
-    //말풍선을 랜덤으로 보여주고 사라지게 하는 클래스스
-    public class UserThinking extends Thread {
-        int num=3;
 
-        @Override
-        public void run() {
-            super.run();
-
-            for(;;){
-                try{
-                    Thread.sleep(1000);
-                    Random rnd = new Random();
-                    num = rnd.nextInt(100);
-                    Thread.sleep(1000);
-                }
-                catch(Exception e){
-                    e.printStackTrace();
-                }
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if(num%3==0){
-                            userimagethink.setVisibility(View.INVISIBLE);
-                        }
-                        else{
-                            userimagethink.setVisibility(View.VISIBLE);
-                            //말풍선과 함께 음성도 나오도록!!ㅋㅋㅋㅋㅋㅋ
-                            MediaPlayer mPlayer2= MediaPlayer.create(getApplicationContext(),R.raw.song_1);
-                            mPlayer2.start();
-                        }
-                    }
-                });
-            }
-        }
-    }
     private long setTriggerTime(int hour, int minute)
     {
         // timepicker
@@ -535,6 +555,91 @@ public class MainActivity extends AppCompatActivity {
         long btime = curTime.getTimeInMillis();
         long triggerTime = btime;
         return triggerTime;
+    }
+    class Motion extends Thread {
+        String nmood;
+        public Motion(String nmood){
+            this.nmood = nmood;
+        }
+
+        @Override
+        public void run() {
+            super.run();
+
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (nmood.equals("happy")) {
+                        Handler mhandler = new Handler();
+                        mhandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                userimagehappy.setVisibility(View.GONE);
+                                level_2_image.setVisibility(View.VISIBLE);
+                            }
+                        },3000);
+                        userimagehappy.setVisibility(View.VISIBLE);
+                        level_2_image.setVisibility(View.GONE);
+
+
+                    }
+                    else {
+                        Handler mhandler = new Handler();
+                        mhandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                userimageunhappy.setVisibility(View.GONE);
+                                level_2_image.setVisibility(View.VISIBLE);
+                            }
+                        },3000);
+                        userimageunhappy.setVisibility(View.VISIBLE);
+                        level_2_image.setVisibility(View.GONE);
+
+
+                    }
+                }
+            });
+
+        }
+    }
+    class UserThinking extends Thread {
+
+        int num = 3;
+
+        @Override
+        public void run() {
+            super.run();
+
+            for (; ; ) {
+                try {
+
+                    Thread.sleep(1000);
+                    Random rnd = new Random();
+                    num = rnd.nextInt(100);
+                    //Log.d("숫자는 ", String.valueOf(num));
+                    thinkingindex = num%8;  //랜덤하게 0~7까지 숫자 받아옴
+                    res = ranthink[thinkingindex];
+
+                    Thread.sleep(1000);
+                } catch (Exception e) {
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        if (num % 3 == 0) {
+                            userimagethink.setImageResource(res);
+                            userimagethink.setVisibility(View.VISIBLE);
+                        } else {
+                            userimagethink.setVisibility(View.INVISIBLE);
+
+
+                        }
+                    }
+                });
+            }
+        }
     }
 
 
